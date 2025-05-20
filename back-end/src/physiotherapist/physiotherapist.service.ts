@@ -9,12 +9,12 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Physiotherapist } from 'src/entities/physiotherapist.entity';
 import { QueryFailedError, Repository } from 'typeorm';
-import { IPhysiotherapist } from 'src/shared/physioterapist.interface';
+import { IPhysiotherapist } from 'src/shared/interfaces/physioterapist.interface';
 import { comparePassword, hashPassword } from 'src/utils/hashPassword';
 import { JwtService } from '@nestjs/jwt';
-import { IPhysiotherapistLogin } from 'src/shared/physiotherapistLogin.interface';
-import { IResetPhysiotherapistPassword } from 'src/shared/physiotherapistResetPassword.interface';
-import { IPhysiotherapistProfileUpdate } from 'src/shared/physiotherapistProfileUpdate.interface';
+import { IPhysiotherapistLogin } from 'src/shared/interfaces/physiotherapistLogin.interface';
+import { IResetPhysiotherapistPassword } from 'src/shared/interfaces/physiotherapistResetPassword.interface';
+import { IPhysiotherapistProfileUpdate } from 'src/shared/interfaces/physiotherapistProfileUpdate.interface';
 import { ObjectId } from 'mongodb';
 
 @Injectable()
