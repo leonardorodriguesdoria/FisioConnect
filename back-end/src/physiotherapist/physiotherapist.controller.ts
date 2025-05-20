@@ -13,6 +13,7 @@ import {
   UseInterceptors,
   HttpCode,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { PhysiotherapistService } from './physiotherapist.service';
 import { CreatePhysiotherapistDto } from './dto/create-physiotherapist.dto';
@@ -21,6 +22,7 @@ import { LoginPhysiotherapistDto } from './dto/login-physiotherapist.dto';
 import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ObjectId } from 'typeorm';
+import { AuthGuard } from 'src/guards/auth.guard';
 
 @Controller('physiotherapist')
 export class PhysiotherapistController {
@@ -31,6 +33,11 @@ export class PhysiotherapistController {
   @Get('list')
   async listAllProfessionals() {
     return await this.physiotherapistService.getAllProfessionals();
+  }
+
+  @Get(':id')
+  async professionalProfile(@Param('id') id: string) {
+    return await this.physiotherapistService.getProfessionalProfile(id);
   }
 
   @Post('register')
@@ -49,12 +56,13 @@ export class PhysiotherapistController {
     );
   }
 
+  @UseGuards(AuthGuard)
   @Patch('update/:id')
   @UseInterceptors(FileInterceptor('image'))
   async updateProfile(
     @Body() updateProfileDto: UpdatePhysiotherapistDto,
     @UploadedFile() image: Express.Multer.File,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     if (image) {
       updateProfileDto.profilePicture = image.path;
@@ -72,6 +80,7 @@ export class PhysiotherapistController {
     };
   }
 
+  @UseGuards(AuthGuard)
   @Delete(':id')
   async removeProfile(@Param('id') id: string) {
     await this.physiotherapistService.deleteProfile(id);

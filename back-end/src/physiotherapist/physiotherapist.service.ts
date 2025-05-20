@@ -210,8 +210,27 @@ export class PhysiotherapistService {
     }
   }
 
+  async getProfessionalProfile(id: string) {
+    try {
+      const objectId = new ObjectId(id);
+      const getProfessional = await this.physiotherapistRepository.findOne({
+        where: {
+          _id: objectId,
+        },
+      });
+
+      const { password, ...rest } = getProfessional;
+
+      return rest;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'Erro interno do sistema. Por favor tente novamente mais tarde',
+      );
+    }
+  }
+
   async updatePhysiotherapistProfile(
-    id: number,
+    id: string,
     body: IPhysiotherapistProfileUpdate,
   ) {
     try {
@@ -219,30 +238,39 @@ export class PhysiotherapistService {
       const { name, email, profilePicture, description, phone, specialties } =
         body;
 
-      const physioterapistExists = await this.physiotherapistRepository.findOne(
-        {
+      const physiotherapistExists =
+        await this.physiotherapistRepository.findOne({
           where: {
             _id: objectId,
           },
-        },
-      );
-      if (!physioterapistExists) {
+        });
+      if (!physiotherapistExists) {
         throw new NotFoundException(
           'Profissional não encontrado. Ocorreu um erro, tente mais tarde',
         );
       }
-      const updatedUser = this.physiotherapistRepository.create({
-        name,
-        email,
-        profilePicture,
-        description,
-        phone,
-        specialties,
+
+      if (body.email && body.email !== physiotherapistExists.email) {
+        const emailInUse = await this.physiotherapistRepository.findOne({
+          where: { email: body.email },
+        });
+        if (emailInUse) {
+          throw new ConflictException(
+            'Este email já está em uso por outro profissional.',
+          );
+        }
+      }
+
+      const updatedData = {
+        ...physiotherapistExists,
+        ...body,
+      };
+
+      await this.physiotherapistRepository.update(objectId, updatedData);
+
+      return await this.physiotherapistRepository.findOne({
+        where: { _id: objectId },
       });
-
-      await this.physiotherapistRepository.save(updatedUser);
-
-      return updatedUser;
     } catch (error) {
       throw new InternalServerErrorException(
         'Erro interno do sistema. Por favor tente mais tarde',

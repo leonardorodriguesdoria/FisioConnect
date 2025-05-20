@@ -6,33 +6,38 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  Matches,
   MaxLength,
 } from 'class-validator';
 
 export class UpdatePhysiotherapistDto {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(50)
   name?: string;
 
-  @IsString()
+  @IsOptional()
   @IsEmail()
-  @IsNotEmpty()
   email?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
+  @Matches(/^\+?[1-9]\d{1,14}$/, {
+    message: 'Número de telefone inválido. Use um formato como +5511999999999',
+  })
   phone?: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
+  @MaxLength(500)
   description?: string;
 
   @IsOptional()
   @IsString()
   profilePicture?: string;
 
-  @IsArray()
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   specialties?: string[];
 }
